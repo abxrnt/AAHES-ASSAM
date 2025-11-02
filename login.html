@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login | AAHES</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #1f2937, #111827);
+      color: #f3f4f6;
+    }
+
+    /* Floating label effect */
+    .floating-label {
+      position: relative;
+      width: 100%;
+    }
+
+    .floating-label input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #374151;
+      border-radius: 0.75rem;
+      background-color: #1f2937;
+      color: #f3f4f6;
+      outline: none;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .floating-label input:focus {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+    }
+
+    .floating-label label {
+      position: absolute;
+      left: 0.75rem;
+      top: 0.75rem;
+      background-color: #1f2937;
+      padding: 0 0.2rem;
+      color: #9ca3af;
+      font-weight: 500;
+      pointer-events: none;
+      transition: all 0.3s ease;
+      font-size: 0.95rem;
+    }
+
+    .floating-label input:focus + label,
+    .floating-label input:not(:placeholder-shown) + label {
+      top: -0.5rem;
+      left: 0.5rem;
+      font-size: 0.75rem;
+      color: #22c55e;
+      font-weight: 600;
+    }
+
+    @keyframes spin-slow { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .animate-spin-slow { animation: spin-slow 25s linear infinite; }
+  </style>
+</head>
+<body class="flex flex-col min-h-screen">
+
+  <!-- Main Content -->
+  <div class="flex-1 flex items-center justify-center">
+    <div class="bg-gray-900 p-6 sm:p-8 rounded-2xl shadow-2xl w-80 sm:w-96 relative overflow-hidden">
+      <!-- Animated Green Header -->
+      <div class="absolute -top-16 -left-16 w-60 h-60 bg-gradient-to-tr from-green-500 to-emerald-600 rounded-full filter blur-3xl opacity-40 animate-spin-slow"></div>
+      
+      <h2 class="text-2xl sm:text-3xl font-extrabold text-green-400 mb-6 text-center drop-shadow-lg">AAHES Login</h2>
+      
+      <form id="loginForm" class="flex flex-col gap-4 relative z-10">
+        <!-- Email Input -->
+        <div class="floating-label">
+          <input type="email" id="email" placeholder=" " required>
+          <label for="email">Email</label>
+        </div>
+
+        <!-- Password Input -->
+        <div class="floating-label">
+          <input type="password" id="password" placeholder=" " required>
+          <label for="password">Password</label>
+        </div>
+
+        <!-- Login Button -->
+        <button type="submit" class="bg-green-600 text-white p-3 rounded-xl font-bold hover:bg-green-700 transition shadow-lg text-sm">Login</button>
+
+        <!-- Error Message -->
+        <p id="errorMsg" class="text-red-500 mt-1 hidden text-center font-medium text-sm"></p>
+
+        <!-- Registration Note -->
+        <p class="text-gray-300 mt-2 text-center text-xs">
+          New user? Please <span class="text-green-400 font-semibold">contact admins</span> to register.
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="bg-gray-800 text-gray-400 py-4 w-full text-center border-t border-gray-700 text-xs sm:text-sm">
+    <p>
+      &copy; 2025 AAHES. All rights reserved. Designed & Developed by 
+      <span class="text-green-400 font-semibold">AAHES & Team</span>
+    </p>
+    <p class="mt-1">
+      Contact: <a href="mailto:helpline.aahes@gmail.com" class="text-green-400 hover:underline">helpline.aahes@gmail.com</a>
+    </p>
+  </footer>
+
+  <script>
+    const users = [
+      { email: "abxrnt@gmail.com", password: "nopass" },
+      { email: "abhileshsarmah0123@gmail.com", password: "abhilesh09" },
+      { email: "dikshitasaikia327@gmail.com", password: "dikshita" },
+      { email: "anupomflutiest123@gmail.com", password: "ABCD1234" },
+      { email: "adityasarmalm@gmail.com", password: "Aditya2006" },
+      { email: "santanukashyap274@gmail.com", password: "Sant@12anu" },
+      { email: "hrisikeshchetia613@gmail.com", password: "Hrisi@123" },
+      { email: "rishsbrajkakoty8@gmail.com", password: "Rishab@123rajkakoty" },
+      { email: "suranganasarmah67@gmail.com", password: "surangana@0" }
+    ];
+
+    const form = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("errorMsg");
+
+    form.addEventListener("submit", function(e){
+      e.preventDefault();
+      const email = document.getElementById("email").value;
+      const password = document.getElementById("password").value;
+
+      const validUser = users.find(u => u.email === email && u.password === password);
+
+      if(validUser){
+        localStorage.setItem("loggedIn", "true"); 
+        window.location.href = "index.html"; 
+      } else {
+        errorMsg.textContent = "Incorrect email or password!";
+        errorMsg.classList.remove("hidden");
+      }
+    });
+
+    if(localStorage.getItem("loggedIn") === "true"){
+      window.location.href = "index.html";
+    }
+  </script>
+
+</body>
+</html>
