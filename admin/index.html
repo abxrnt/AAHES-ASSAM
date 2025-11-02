@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AAHES | Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://kit.fontawesome.com/a2e0ef7f4b.js" crossorigin="anonymous"></script>
+
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #000);
+      color: #e5e7eb;
+      overflow-x: hidden;
+    }
+    input {
+      background-color: #1e293b;
+      color: #e2e8f0;
+      border: 1px solid #334155;
+      transition: all 0.2s ease;
+    }
+    input:focus {
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.3);
+      outline: none;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- Top Navbar -->
+  <header class="w-full bg-gray-900 border-b border-gray-700 py-4 px-6 flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-emerald-400">AAHES Admin Panel</h1>
+    <div id="authControls">
+      <button id="loginBtn" class="flex items-center gap-2 bg-gradient-to-r from-emerald-500 to-green-600 text-white px-5 py-2 rounded-lg hover:from-emerald-600 hover:to-green-700 transition">
+        <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" class="w-5 h-5 bg-white rounded-full p-0.5">
+        Sign in with Google
+      </button>
+
+      <div id="userSection" class="hidden flex items-center gap-4">
+        <p class="text-sm text-gray-300">Logged in as <span id="userEmail" class="text-emerald-400 font-medium"></span></p>
+        <button id="logoutBtn" class="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition">
+          <i class="fa-solid fa-right-from-bracket mr-1"></i> Logout
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Form -->
+  <main class="flex-grow flex flex-col items-center justify-center px-6 py-10">
+    <div class="w-full max-w-3xl">
+      <h2 class="text-2xl font-semibold text-emerald-400 mb-6 text-center">Upload CEE Cutoff Data</h2>
+
+      <form id="uploadForm" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+        <input type="text" id="college" placeholder="College (AEC, JEC...)" class="w-full p-3 rounded-lg" required>
+        <input type="text" id="branch" placeholder="Branch (CSE, ECE...)" class="w-full p-3 rounded-lg" required>
+        <input type="text" id="cat" placeholder="Category (GEN, OBC...)" class="w-full p-3 rounded-lg" required>
+        <input type="text" id="round" placeholder="Round (1, 2, 3)" class="w-full p-3 rounded-lg" required>
+        <input type="number" id="close" placeholder="Closing Rank" class="w-full p-3 rounded-lg" required>
+        <input type="number" id="marks" placeholder="Marks" class="w-full p-3 rounded-lg" required>
+
+        <div class="sm:col-span-2">
+          <button type="submit" class="w-full py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white font-semibold rounded-lg hover:from-emerald-600 hover:to-green-700 transition">
+            <i class="fa-solid fa-cloud-arrow-up mr-2"></i> Upload Data
+          </button>
+        </div>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-gray-900 border-t border-gray-700 py-3 text-center text-gray-500 text-sm">
+    © 2025 AAHES Admin Panel | Developed for internal management
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
+    import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-firestore.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+    // Firebase Config
+    const firebaseConfig = {
+      apiKey: "AIzaSyBOVl1hdmprJXpgdN_sNTO3FsNePD_zNZY",
+      authDomain: "aahes-cee-cutoffs.firebaseapp.com",
+      projectId: "aahes-cee-cutoffs",
+      storageBucket: "aahes-cee-cutoffs.firebasestorage.app",
+      messagingSenderId: "706066626405",
+      appId: "1:706066626405:web:0d254ab82beb288108938c"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const auth = getAuth();
+    const provider = new GoogleAuthProvider();
+
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const userEmail = document.getElementById("userEmail");
+    const uploadForm = document.getElementById("uploadForm");
+    const userSection = document.getElementById("userSection");
+    const authControls = document.getElementById("authControls");
+
+    // Sign in with Google
+    loginBtn.addEventListener("click", async () => {
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        alert("⚠️ Sign-in failed: " + error.message);
+      }
+    });
+
+    // Logout
+    logoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+    });
+
+    // Auth observer
+    onAuthStateChanged(auth, user => {
+      if (user) {
+        loginBtn.classList.add("hidden");
+        userSection.classList.remove("hidden");
+        userEmail.textContent = user.email;
+        uploadForm.classList.remove("hidden");
+      } else {
+        loginBtn.classList.remove("hidden");
+        userSection.classList.add("hidden");
+        uploadForm.classList.add("hidden");
+      }
+    });
+
+    // Upload Form
+    uploadForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const newDoc = {
+        college: uploadForm.college.value.trim(),
+        branch: uploadForm.branch.value.trim(),
+        cat: uploadForm.cat.value.trim(),
+        round: uploadForm.round.value.trim(),
+        close: Number(uploadForm.close.value),
+        marks: Number(uploadForm.marks.value)
+      };
+
+      try {
+        await addDoc(collection(db, "cutoffs"), newDoc);
+        alert("✅ Data uploaded successfully!");
+        uploadForm.reset();
+      } catch (err) {
+        alert("❌ Upload failed: " + err.message);
+      }
+    });
+  </script>
+</body>
+</html>
